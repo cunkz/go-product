@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 
-	"github.com/cunkz/go-lab-product/bin/config"
-	productHandler "github.com/cunkz/go-lab-product/bin/modules/product/handlers"
+	"github.com/cunkz/go-product/bin/config"
+	productHandler "github.com/cunkz/go-product/bin/modules/product/handlers"
 	"github.com/gofiber/fiber/v2"
 )
 

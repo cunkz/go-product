@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	// "fmt"
 
-	"github.com/cunkz/go-lab-product/bin/config"
+	"github.com/cunkz/go-product/bin/config"
 	// _ "github.com/lib/pq"
 )
 
