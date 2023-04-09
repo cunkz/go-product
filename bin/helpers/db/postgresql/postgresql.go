@@ -5,22 +5,22 @@ import (
 	// "fmt"
 
 	"github.com/cunkz/go-product/bin/config"
-	// _ "github.com/lib/pq"
+	_ "github.com/lib/pq"
 )
 
 var pgClient *sql.DB
 
 func InitConnection() {
 	psqlInfo := config.GetConfig().DsnPostgreSQL()
-	pgClient, err := sql.Open("postgres", psqlInfo)
+	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
 		panic(err)
 	}
 
-	pgClient.SetMaxOpenConns(5)
-	pgClient.SetMaxIdleConns(5)
+	db.SetMaxOpenConns(5)
+	db.SetMaxIdleConns(5)
 
-	defer pgClient.Close()
+	pgClient = db
 }
 
 func GetDB() *sql.DB {
