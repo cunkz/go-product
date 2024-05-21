@@ -3,23 +3,24 @@ package handlers
 import (
 	"fmt"
 	"time"
+	"log"
 
 	postgresqlHelper "github.com/cunkz/go-product/bin/helpers/db/postgresql"
 	wrapperHelper "github.com/cunkz/go-product/bin/helpers/utils"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
-
-	"database/sql"
+	"github.com/jmoiron/sqlx"
 
 	_ "github.com/lib/pq"
 )
 
 type Product struct {
-	Label string `json:"label" xml:"label" form:"label"`
+	ProductId string `db:"productid" json:"productid" xml:"productid" form:"productid"`
+	Label string `db:"label" json:"label" xml:"label" form:"label"`
 }
 
 func AddProduct(c *fiber.Ctx) error {
-	var db *sql.DB
+	var db *sqlx.DB
 	var err error
 	db = postgresqlHelper.GetDB()
 
@@ -29,18 +30,18 @@ func AddProduct(c *fiber.Ctx) error {
 	if err := c.BodyParser(p); err != nil {
 		return err
 	}
+	p.ProductId = uuid.New().String()
 
-	itemUUID := uuid.New()
 	sqlStatement := `
 	INSERT INTO products (productid, label, created_at, updated_at)
 	VALUES ($1, $2, $3, $4)`
-	_, err = db.Exec(sqlStatement, itemUUID, p.Label, time.Now(), time.Now())
+	_, err = db.Exec(sqlStatement, p.ProductId, p.Label, time.Now(), time.Now())
 	if err != nil {
 		panic(err)
 	}
 
 	item := fiber.Map{
-		"productid": itemUUID,
+		"productid": p.ProductId,
 	}
 
 	result := wrapperHelper.Success(item)
@@ -48,38 +49,57 @@ func AddProduct(c *fiber.Ctx) error {
 }
 
 func EditProduct(c *fiber.Ctx) error {
-	return c.SendString("Product has been edited #" + c.Params("id"))
+	return c.SendString("Product #" + c.Params("id") + " has been edited")
 }
 
 func FetchProduct(c *fiber.Ctx) error {
-	return c.SendString("Sucess fetch list of Product")
+	var db *sqlx.DB
+	db = postgresqlHelper.GetDB()
+
+	var products []Product
+	product := Product{}
+	sqlStatement := `SELECT productid, label FROM products`
+  rows, _ := db.Queryx(sqlStatement)
+	for rows.Next() {
+		err := rows.StructScan(&product)
+		if err != nil {
+				log.Fatalln(err)
+		}
+		products = append(products, product)
+	}
+
+	items := fiber.Map{
+		"items": products,
+	}
+
+	result := wrapperHelper.Success(items)
+	return wrapperHelper.Response(c, "success", result, "Sucess fetch list of Product", 200)
 }
 
 func FetchProductById(c *fiber.Ctx) error {
-	var db *sql.DB
+	var db *sqlx.DB
 	db = postgresqlHelper.GetDB()
-	sqlStatement := `SELECT label FROM products WHERE productid=$1;`
-	var label string
-	// Replace 3 with an ID from your database or another random
-	// value to test the no rows use case.
-	row := db.QueryRow(sqlStatement, c.Params("id"))
-	switch err := row.Scan(&label); err {
-	case sql.ErrNoRows:
-		fmt.Println("No rows were returned!")
-	case nil:
-		fmt.Println(label)
-	default:
-		panic(err)
+	// var label string
+
+	product := Product{}
+	sqlStatement := `SELECT productid, label FROM products WHERE productid=$1 LIMIT 1`
+  rows, _ := db.Queryx(sqlStatement, c.Params("id"))
+	for rows.Next() {
+		err := rows.StructScan(&product)
+		if err != nil {
+				log.Fatalln(err)
+		}
 	}
 
 	item := fiber.Map{
-		"label": label,
+		"productid": product.ProductId,
+		"label": product.Label,
 	}
 
 	result := wrapperHelper.Success(item)
-	return wrapperHelper.Response(c, "success", result, fmt.Sprintf("Success get a single Product #%s", c.Params("id")), 200)
+	return wrapperHelper.Response(c, "success", result, "Success get a single Product", 200)
 }
 
-func DeleteProduct(c *fiber.Ctx) error {
-	return c.SendString("Product has been deleted #" + c.Params("id"))
+func RemoveProduct(c *fiber.Ctx) error {
+	return c.SendString("Product #" + c.Params("id") + " has been removed")
 }

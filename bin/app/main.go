@@ -21,7 +21,7 @@ func main() {
 	app.Get("/api/product/v1", productHandler.FetchProduct)
 	app.Get("/api/product/v1/:id", productHandler.FetchProductById)
 	app.Put("/api/product/v1/:id", productHandler.EditProduct)
-	app.Delete("/api/product/v1/:id", productHandler.DeleteProduct)
+	app.Delete("/api/product/v1/:id", productHandler.RemoveProduct)
 
 	// ----- init section -----
 	postgresqlHelper.InitConnection()

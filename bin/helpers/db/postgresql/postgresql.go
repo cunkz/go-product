@@ -1,18 +1,19 @@
 package postgresql
 
 import (
-	"database/sql"
+	// "database/sql"
+	"github.com/jmoiron/sqlx"
 	// "fmt"
 
 	"github.com/cunkz/go-product/bin/config"
 	_ "github.com/lib/pq"
 )
 
-var pgClient *sql.DB
+var pgClient *sqlx.DB
 
 func InitConnection() {
 	psqlInfo := config.GetConfig().DsnPostgreSQL()
-	db, err := sql.Open("postgres", psqlInfo)
+	db, err := sqlx.Connect("postgres", psqlInfo)
 	if err != nil {
 		panic(err)
 	}
@@ -23,6 +24,6 @@ func InitConnection() {
 	pgClient = db
 }
 
-func GetDB() *sql.DB {
+func GetDB() *sqlx.DB {
 	return pgClient
 }
