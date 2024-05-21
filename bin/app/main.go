@@ -6,6 +6,7 @@ import (
 	"github.com/cunkz/go-product/bin/config"
 	postgresqlHelper "github.com/cunkz/go-product/bin/helpers/db/postgresql"
 	productHandler "github.com/cunkz/go-product/bin/modules/product/handlers"
+	wrapperHelper "github.com/cunkz/go-product/bin/helpers/utils"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -13,7 +14,7 @@ func main() {
 	app := fiber.New()
 
 	app.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString(`{"success":true,"data":"Index","message":"This service is running properly","code":200}`)
+		return wrapperHelper.Response(c, "default", nil, "This service is running properly", 200)
 	})
 
 	app.Post("/api/product/v1", productHandler.AddProduct)

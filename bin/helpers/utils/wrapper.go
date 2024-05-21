@@ -27,8 +27,7 @@ func Response(c *fiber.Ctx, responseType string, responseData fiber.Map, respons
 		if responseMessage == "" {
 			responseMessage = fiber.ErrInternalServerError.Message
 		}
-	} else {
-		responseCode = 200
+	} else if responseType != "default" {
 		_, checkData := responseData["data"]
 		if !checkData {
 			responseCode = fiber.ErrNotFound.Code
