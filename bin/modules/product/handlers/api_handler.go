@@ -49,7 +49,7 @@ func AddProduct(c *fiber.Ctx) error {
 }
 
 func EditProduct(c *fiber.Ctx) error {
-	return c.SendString("Product #" + c.Params("id") + " has been edited")
+	return wrapperHelper.Response(c, "default", nil, "Product #" + c.Params("id") + " has been edited", 200)
 }
 
 func FetchProduct(c *fiber.Ctx) error {
@@ -101,5 +101,5 @@ func FetchProductById(c *fiber.Ctx) error {
 }
 
 func RemoveProduct(c *fiber.Ctx) error {
-	return c.SendString("Product #" + c.Params("id") + " has been removed")
+	return wrapperHelper.Response(c, "default", nil, "Product #" + c.Params("id") + " has been removed", 200)
 }
