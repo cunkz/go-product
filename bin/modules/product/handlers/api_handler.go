@@ -44,7 +44,7 @@ func AddProduct(c *fiber.Ctx) error {
 	}
 
 	result := wrapperHelper.Success(item)
-	return wrapperHelper.Response(c, "success", result, "Product has been added", 200)
+	return wrapperHelper.Response(c, "success", result, "Product has been added", 201)
 }
 
 func EditProduct(c *fiber.Ctx) error {
