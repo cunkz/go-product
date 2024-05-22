@@ -90,6 +90,9 @@ func FetchProductById(c *fiber.Ctx) error {
 				log.Fatalln(err)
 		}
 	}
+	if product.ProductId == "" {
+		return wrapperHelper.Response(c, "fail", nil, "Product not found", 404)
+	}
 
 	item := fiber.Map{
 		"productid": product.ProductId,
@@ -97,7 +100,7 @@ func FetchProductById(c *fiber.Ctx) error {
 	}
 
 	result := wrapperHelper.Success(item)
-	return wrapperHelper.Response(c, "success", result, "Success get a single Product", 200)
+	return wrapperHelper.Response(c, "success", result, "Success get detail of Product #" + c.Params("id"), 200)
 }
 
 func RemoveProduct(c *fiber.Ctx) error {
