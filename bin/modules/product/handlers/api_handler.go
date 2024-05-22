@@ -104,5 +104,25 @@ func FetchProductById(c *fiber.Ctx) error {
 }
 
 func RemoveProduct(c *fiber.Ctx) error {
+	var db *sqlx.DB
+	db = postgresqlHelper.GetDB()
+
+	product := Product{}
+	sqlStatement := `SELECT productid, label FROM products WHERE productid=$1 LIMIT 1`
+  rows, _ := db.Queryx(sqlStatement, c.Params("id"))
+	for rows.Next() {
+		err := rows.StructScan(&product)
+		if err != nil {
+				log.Fatalln(err)
+		}
+	}
+	if product.ProductId == "" {
+		return wrapperHelper.Response(c, "fail", nil, "Product not found", 404)
+	}
+
+	_, err := db.Exec("DELETE FROM products WHERE productid=$1", product.ProductId)
+	if err != nil {
+		log.Fatalln(err)
+	}
 	return wrapperHelper.Response(c, "default", nil, "Product #" + c.Params("id") + " has been removed", 200)
 }
