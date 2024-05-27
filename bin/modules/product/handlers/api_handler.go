@@ -20,8 +20,8 @@ type Product struct {
 }
 
 func AddProduct(c *fiber.Ctx) error {
-	var db *sqlx.DB
 	var err error
+	var db *sqlx.DB
 	db = postgresqlHelper.GetDB()
 
 	fmt.Println("Successfully connected!")
