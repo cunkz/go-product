@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-
+	"github.com/gofiber/fiber/v2"
 	"github.com/cunkz/go-product/bin/config"
 	postgresqlHelper "github.com/cunkz/go-product/bin/helpers/db/postgresql"
-	productHandler "github.com/cunkz/go-product/bin/modules/product/handlers"
 	wrapperHelper "github.com/cunkz/go-product/bin/helpers/utils"
-	"github.com/gofiber/fiber/v2"
+
+	productHandler "github.com/cunkz/go-product/bin/modules/product/handlers"
+	userHandler "github.com/cunkz/go-product/bin/modules/user/handlers"
 )
 
 func main() {
@@ -16,6 +17,8 @@ func main() {
 	app.Get("/", func(c *fiber.Ctx) error {
 		return wrapperHelper.Response(c, "default", nil, "This service is running properly", 200)
 	})
+
+	app.Post("/api/user/v1/login", userHandler.Login)
 
 	app.Post("/api/product/v1", productHandler.AddProduct)
 	app.Get("/api/product/v1", productHandler.FetchProduct)
