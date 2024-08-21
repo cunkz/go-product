@@ -13,6 +13,10 @@ type envConfig struct {
 	AppName    string
 	AppPort    string
 	AppVersion string
+	JwtAudience string
+	JwtIssuer string
+	JwtPrivateKey string
+	JwtPublicKey string
 }
 
 func (e envConfig) DsnPostgreSQL() string {
@@ -45,6 +49,10 @@ func init() {
 		AppName:    os.Getenv("APP_NAME"),
 		AppPort:    os.Getenv("APP_PORT"),
 		AppVersion: os.Getenv("APP_VERSION"),
+		JwtAudience: os.Getenv("JWT_AUDIENCE"),
+		JwtIssuer: os.Getenv("JWT_ISSUER"),
+		JwtPrivateKey: os.Getenv("JWT_PRIVATE_KEY"),
+		JwtPublicKey: os.Getenv("JWT_PUBLIC_KEY"),
 	}
 }
 

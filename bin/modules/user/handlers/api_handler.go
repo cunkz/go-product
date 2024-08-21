@@ -1,19 +1,31 @@
 package handlers
 
 import (
+	// "fmt"
 	"time"
+	"encoding/base64"
 
 	wrapperHelper "github.com/cunkz/go-product/bin/helpers/utils"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/cunkz/go-product/bin/config"
 )
 
-var jwtSecretKey = []byte("jwt-secret-key")
-var jwtIssuer = "jwt-issuer"
-var jwtAudience = "jwt-audience"
+var jwtIssuer = config.GetConfig().JwtIssuer
+var jwtAudience = config.GetConfig().JwtAudience
 
 func Login(c *fiber.Ctx) error {
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, 
+	privateKeyString, err := base64.StdEncoding.DecodeString(config.GetConfig().JwtPrivateKey)
+	if err != nil {
+		return err
+	}
+
+	privateKey, err := jwt.ParseRSAPrivateKeyFromPEM([]byte(privateKeyString))
+	if err != nil {
+		return err
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodRS256, 
 		jwt.MapClaims{
 			"user": map[string]string{ "userId": "sampleuser"	},
 			"client": map[string]string{ "clientId": "sampleclient"	},
@@ -23,7 +35,7 @@ func Login(c *fiber.Ctx) error {
 			"iss": jwtIssuer,
 		})
 
-	tokenString, err := token.SignedString(jwtSecretKey)
+	tokenString, err := token.SignedString(privateKey)
 	if err != nil {
 		return err
 	}
@@ -39,4 +51,16 @@ func Login(c *fiber.Ctx) error {
 
 	result := wrapperHelper.Success(item)
 	return wrapperHelper.Response(c, "success", result, "Successfully Logged", 201)
+}
+
+func GetMe(c *fiber.Ctx) error {
+	claims := c.Locals("claims").(*jwt.MapClaims)
+
+	item := fiber.Map{
+		"client": (*claims)["client"],
+		"user": (*claims)["user"],
+	}
+
+	result := wrapperHelper.Success(item)
+	return wrapperHelper.Response(c, "success", result, "Successfully Get Me", 200)
 }
